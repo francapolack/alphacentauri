@@ -44,6 +44,10 @@ class GameView(arcade.Window):
             wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", scale=TILE_SCALING)
             wall.position = coordinate
             self.wall_list.append(wall)
+        
+        self.physics_engine=arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
+
+
         self.background_color = arcade.csscolor.CORNFLOWER_BLUE
 
 
@@ -67,8 +71,28 @@ class GameView(arcade.Window):
         # Code to draw other things will go here
         self.player_list.draw()
         self.wall_list.draw()
+    def on_key_press(self, tecla, modifiers):
+        if tecla==arcade.key.UP or tecla==arcade.key.W:
+            self.player_sprite.change_y=PLAYER_MOVEMENT_SPEED
+        elif tecla==arcade.key.DOWN or tecla==arcade.key.S:
+             self.player_sprite.change_y=-PLAYER_MOVEMENT_SPEED
+        elif tecla==arcade.key.LEFT or tecla==arcade.key.A:
+             self.player_sprite.change_x=-PLAYER_MOVEMENT_SPEED
+        elif tecla==arcade.key.RIGHT or tecla==arcade.key.D:
+             self.player_sprite.change_x=PLAYER_MOVEMENT_SPEED
 
+    def on_key_release(self, tecla, modifiers):
+        if tecla==arcade.key.UP or tecla==arcade.key.W:
+            self.player_sprite.change_y=0
+        elif tecla==arcade.key.DOWN or tecla==arcade.key.S:
+            self.player_sprite.change_y=0
+        elif tecla==arcade.key.LEFT or tecla==arcade.key.A:
+            self.player_sprite.change_x=0
+        elif tecla==arcade.key.RIGHT or tecla==arcade.key.D:
+            self.player_sprite.change_x=0
 
+    def on_update(self, delta_time):
+        self.physics_engine.update()
 def main():
     """Main function"""
     window=GameView()
