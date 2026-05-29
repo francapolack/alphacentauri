@@ -29,9 +29,12 @@ class GameView(arcade.Window):
         # Call the parent class to set up the window
         super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, resizable=True)
         self.scene=arcade.Scene()
+
         self.camara=None
 
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
+
+        self.tile_map=None
         
 
 
@@ -42,32 +45,25 @@ class GameView(arcade.Window):
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
+        layer_options={
+            "Plataforms":{
+                "use_spatial_hash":True
+            }
+        }
+
+        self.tile_map=arcade.load_tilemap(":resources:tiled_maps/map.json",scaling=TILE_SCALING,layer_options=layer_options,)
+        self.scene=arcade.Scene.from_tilemap(self.tile_map)
+
         self.player_texture = arcade.load_texture("placeholderastronaut.jpeg")
-        self.player_sprite = arcade.Sprite(self.player_texture)
-        self.player_sprite.center_x = 500
-        self.player_sprite.center_y = 500
+
+        
 
         self.player_sprite=arcade.Sprite(self.player_texture)
         self.player_sprite.center_x=64
         self.player_sprite.center_y=128
         self.scene.add_sprite("Jugador",self.player_sprite)
 
-        self.scene.add_sprite_list("Paredes",use_spatial_hash=True)
-
-        self.wall_list=arcade.SpriteList(use_spatial_hash=True)
-        for x in range(0, 1250, 64):
-            wall = arcade.Sprite(":resources:images/tiles/grassMid.png", scale=TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 32
-            self.scene.add_sprite("Paredes",wall)
-
-        coordinate_list = [[512, 96], [256, 96], [768, 96]]
-        for coordinate in coordinate_list:
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", scale=TILE_SCALING)
-            wall.position = coordinate
-            self.scene.add_sprite("Paredes",wall)
-        
-        self.physics_engine=arcade.PhysicsEnginePlatformer(self.player_sprite, walls=self.scene["Paredes"],gravity_constant=GRAVEDAD)
+        self.physics_engine=arcade.PhysicsEnginePlatformer(self.player_sprite, walls=self.scene["Platforms"],gravity_constant=GRAVEDAD)
 
         self.camara=arcade.Camera2D()
 
