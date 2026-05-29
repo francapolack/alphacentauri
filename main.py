@@ -12,7 +12,8 @@ START=0
 END=2000
 STEP=50
 WINDOW_TITLE = "Platformer"
-
+TILE_SCALING=0.5
+PLAYER_MOVEMENT_SPEED=5
 
 class GameView(arcade.Window):
     """
@@ -32,8 +33,17 @@ class GameView(arcade.Window):
         self.player_list.append(self.player_sprite)
 
         self.wall_list=arcade.SpriteList(use_spatial_hash=True)
+        for x in range(0, 1250, 64):
+            wall = arcade.Sprite(":resources:images/tiles/grassMid.png", scale=TILE_SCALING)
+            wall.center_x = x
+            wall.center_y = 32
+            self.wall_list.append(wall)
 
-
+        coordinate_list = [[512, 96], [256, 96], [768, 96]]
+        for coordinate in coordinate_list:
+            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", scale=TILE_SCALING)
+            wall.position = coordinate
+            self.wall_list.append(wall)
         self.background_color = arcade.csscolor.CORNFLOWER_BLUE
 
 
@@ -56,6 +66,7 @@ class GameView(arcade.Window):
 
         # Code to draw other things will go here
         self.player_list.draw()
+        self.wall_list.draw()
 
 
 def main():
