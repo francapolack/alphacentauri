@@ -13,7 +13,11 @@ END=2000
 STEP=50
 WINDOW_TITLE = "Platformer"
 TILE_SCALING=0.5
-PLAYER_MOVEMENT_SPEED=5
+PLAYER_VELOCIDAD_MOVIMIENTO=5
+PLAYER_VELOCIDAD_SALTO=20
+
+GRAVEDAD=1
+
 
 class GameView(arcade.Window):
     """
@@ -24,6 +28,21 @@ class GameView(arcade.Window):
 
         # Call the parent class to set up the window
         super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, resizable=True)
+        self.player_texture = None
+        self.player_sprite = None
+        self.player_list = None
+        self.wall_list = None
+
+        
+
+
+    def on_resize(self,WINDOW_WIDTH, WINDOW_HEIGHT):
+        super().on_resize(WINDOW_WIDTH,WINDOW_HEIGHT)
+        print(f"Tamaño de ventana cambiado a:{WINDOW_WIDTH} X {WINDOW_HEIGHT}")
+
+
+    def setup(self):
+        """Set up the game here. Call this function to restart the game."""
         self.player_texture = arcade.load_texture("placeholderastronaut.jpeg")
         self.player_sprite = arcade.Sprite(self.player_texture)
         self.player_sprite.center_x = 500
@@ -45,20 +64,11 @@ class GameView(arcade.Window):
             wall.position = coordinate
             self.wall_list.append(wall)
         
-        self.physics_engine=arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
+        self.physics_engine=arcade.PhysicsEnginePlatformer(self.player_sprite, walls=self.wall_list,gravity_constant=GRAVEDAD)
 
 
         self.background_color = arcade.csscolor.CORNFLOWER_BLUE
 
-
-    def on_resize(self,WINDOW_WIDTH, WINDOW_HEIGHT):
-        super().on_resize(WINDOW_WIDTH,WINDOW_HEIGHT)
-        print(f"Tamaño de ventana cambiado a:{WINDOW_WIDTH} X {WINDOW_HEIGHT}")
-
-
-    def setup(self):
-        """Set up the game here. Call this function to restart the game."""
-        pass
 
     def on_draw(self):
         """Render the screen."""
@@ -73,17 +83,23 @@ class GameView(arcade.Window):
         self.wall_list.draw()
     def on_key_press(self, tecla, modifiers):
         if tecla==arcade.key.UP or tecla==arcade.key.W:
-            self.player_sprite.change_y=PLAYER_MOVEMENT_SPEED
+            if self.physics_engine.can_jump():
+                self.player_sprite,change_y= PLAYER_VELOCIDAD_SALTO
+
         elif tecla==arcade.key.DOWN or tecla==arcade.key.S:
-             self.player_sprite.change_y=-PLAYER_MOVEMENT_SPEED
+             self.player_sprite.change_y=-PLAYER_VELOCIDAD_MOVIMIENTO
         elif tecla==arcade.key.LEFT or tecla==arcade.key.A:
-             self.player_sprite.change_x=-PLAYER_MOVEMENT_SPEED
+             self.player_sprite.change_x=-PLAYER_VELOCIDAD_MOVIMIENTO
         elif tecla==arcade.key.RIGHT or tecla==arcade.key.D:
-             self.player_sprite.change_x=PLAYER_MOVEMENT_SPEED
+             self.player_sprite.change_x=PLAYER_VELOCIDAD_MOVIMIENTO
+
+        if tecla==arcade.key.ESCAPE:
+                self.setup()
 
     def on_key_release(self, tecla, modifiers):
         if tecla==arcade.key.UP or tecla==arcade.key.W:
-            self.player_sprite.change_y=0
+            if self.physics_engine.can_jump():
+                self.player_sprite.change_y=PLAYER_VELOCIDAD_SALTO
         elif tecla==arcade.key.DOWN or tecla==arcade.key.S:
             self.player_sprite.change_y=0
         elif tecla==arcade.key.LEFT or tecla==arcade.key.A:
