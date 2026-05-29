@@ -28,11 +28,14 @@ class GameView(arcade.Window):
 
         # Call the parent class to set up the window
         super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, resizable=True)
+        self.scene=arcade.Scene()
         self.player_texture = None
         self.player_sprite = None
         self.player_list = None
         self.wall_list = None
+        self.camara=None
 
+        self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         
 
 
@@ -66,6 +69,8 @@ class GameView(arcade.Window):
         
         self.physics_engine=arcade.PhysicsEnginePlatformer(self.player_sprite, walls=self.wall_list,gravity_constant=GRAVEDAD)
 
+        self.camara=arcade.Camera2D()
+
 
         self.background_color = arcade.csscolor.CORNFLOWER_BLUE
 
@@ -77,6 +82,7 @@ class GameView(arcade.Window):
         # set to. This ensures that you have a clean slate for drawing each
         # frame of the game.
         self.clear()
+        self.camara.use()
 
         # Code to draw other things will go here
         self.player_list.draw()
@@ -84,7 +90,8 @@ class GameView(arcade.Window):
     def on_key_press(self, tecla, modifiers):
         if tecla==arcade.key.UP or tecla==arcade.key.W:
             if self.physics_engine.can_jump():
-                self.player_sprite,change_y= PLAYER_VELOCIDAD_SALTO
+                self.player_sprite.change_y= PLAYER_VELOCIDAD_SALTO
+                arcade.play_sound(self.jump_sound)
 
         elif tecla==arcade.key.DOWN or tecla==arcade.key.S:
              self.player_sprite.change_y=-PLAYER_VELOCIDAD_MOVIMIENTO
@@ -109,6 +116,7 @@ class GameView(arcade.Window):
 
     def on_update(self, delta_time):
         self.physics_engine.update()
+        self.camara.position=self.player_sprite.position
 def main():
     """Main function"""
     window=GameView()
